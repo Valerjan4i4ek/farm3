@@ -30,14 +30,16 @@ public class Game
     }
 
     public Game(List<Plant> plants, int cash, int fieldSize) {
-        this.cash = cash;
+
         this.plants = plants;
         this.scanner = new Scanner(System.in);
-        cache = new MySQLCache(fieldSize);
+        cache = new MySQLCache(cash, fieldSize);
+        this.cash = cache.getCash();
     }
 
     public void start() {
         while (true) {
+//            cash = cache.getCash();
             System.out.println(cache.getFields().values());
             System.out.println("YOUR CASH : " + cash);
             System.out.println("Enter cell for your plant (1-8)");
@@ -51,6 +53,7 @@ public class Game
                         cash -= plant.getSeedPrice();
                         cache.getFields().put(fieldNumber, field.updateField(plant));
                         cache.addPlant(fieldNumber, field);
+                        cache.addCash(cash);
                     });
                 } else {
                     cash += field.getHarvestPrice();
@@ -88,9 +91,10 @@ public class Game
         return Optional.empty();
     }
 
-    public void  getHarvest(int fieldNumber) {
+    public void getHarvest(int fieldNumber) {
         cache.getFields().put(fieldNumber, cache.getFields().get(fieldNumber).updateField());
         cache.addPlant(fieldNumber, cache.getFields().get(fieldNumber));
+
         System.out.println(cache.getFields().values());
     }
 
