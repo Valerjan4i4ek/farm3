@@ -9,11 +9,12 @@ public class MySQLCache
     MySQLClass2 sql;
     List<Integer> listCash;
 
-    public MySQLCache(int fieldSize){
+    public MySQLCache(int cash, int fieldSize){
         this.cache = new ConcurrentHashMap<>();
         sql = new MySQLClass2();
-        listCash = new CopyOnWriteArrayList<>();
+        this.listCash = new CopyOnWriteArrayList<>();
         init(fieldSize);
+        initCash(cash);
     }
 
     public void addPlant(Integer idField, Field field){
@@ -25,6 +26,22 @@ public class MySQLCache
 
     public void addCash(Integer cash){
         listCash.add(cash);
+        sql.addCash(cash);
+    }
+
+    public void initCash(int cash){
+        try{
+            listCash.add(cash);
+
+            List<Integer> list = sql.cacheCash();
+            if(list != null && !list.isEmpty()){
+                for(int i : list){
+                    listCash.add(i);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public void init(int fieldSize){
@@ -32,8 +49,10 @@ public class MySQLCache
             for (int i = 0; i < fieldSize; i++)
             {
                 cache.put(i, new Field());
+
             }
             Map<Integer, Field> tmp = sql.cache();
+
             if (tmp != null && !tmp.isEmpty()){
                 for(int id : tmp.keySet()){
                     Field field = tmp.get(id);
@@ -50,5 +69,9 @@ public class MySQLCache
     public Map<Integer, Field> getFields()
     {
         return cache;
+    }
+
+    public Integer getCash(){
+        return listCash.get(listCash.size()-1);
     }
 }
