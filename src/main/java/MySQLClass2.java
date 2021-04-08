@@ -1,13 +1,16 @@
 import java.lang.reflect.InvocationTargetException;
 import java.sql.*;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class MySQLClass2
 {
     public MySQLClass2(){
         baseCreate();
         tableCreate();
+        cashTableCreate();
     }
 
     public Connection getConnection(String dbName) throws SQLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -86,13 +89,45 @@ public class MySQLClass2
             e.printStackTrace();
         }
     }
+
+    public void cashTableCreate(){
+        try{
+            Connection conn = null;
+            Statement st = null;
+
+            try{
+                conn = getConnection("farm");
+                st = conn.createStatement();
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS farm.cash (cash INT NOT NULL)");
+            }
+            finally{
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(st != null){
+                        st.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public void addPlant(Integer field, Field plant){
         try{
             Connection conn = null;
             PreparedStatement ps = null;
 
             try{
-
                 conn = getConnection("farm");
 
                 ps = conn.prepareStatement("INSERT INTO plants" + "(field, plant, sPrice, hPrice, timer, sign) " +
@@ -133,6 +168,38 @@ public class MySQLClass2
             e.printStackTrace();
         }
     }
+
+    public void addCash(Integer cash){
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+
+            try{
+                conn = getConnection("farm");
+                ps = conn.prepareStatement("INSERT INTO cash (cash) VALUES (?)");
+                ps.setInt(1, cash);
+                ps.executeUpdate();
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public Map<Integer, Field> cache(){
         Map<Integer, Field> map = new ConcurrentHashMap<>();
 
@@ -192,5 +259,58 @@ public class MySQLClass2
         }
 
         return map;
+    }
+
+    public List<Integer> cacheCash(){
+        List<Integer> list = new CopyOnWriteArrayList<>();
+
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try{
+                conn = getConnection("farm");
+                String query = "SELECT * FROM cash";
+                ps = conn.prepareStatement(query);
+                rs = ps.executeQuery();
+
+                while (rs.next()){
+                    try{
+                        int cash = rs.getInt("cash");
+
+                        list.add(cash);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(rs != null){
+                        rs.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }
