@@ -11,6 +11,7 @@ public class MySQLClass2
         baseCreate();
         tableCreate();
         cashTableCreate();
+        timeTableCreate();
     }
 
     public Connection getConnection(String dbName) throws SQLException, ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -122,6 +123,38 @@ public class MySQLClass2
         }
     }
 
+    public void timeTableCreate(){
+        try{
+            Connection conn = null;
+            Statement st = null;
+
+            try{
+                conn = getConnection("farm");
+                st = conn.createStatement();
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS farm.time (time BIGINT NOT NULL)");
+            }
+            finally{
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(st != null){
+                        st.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public void addPlant(Integer field, Field plant){
         try{
             Connection conn = null;
@@ -178,6 +211,37 @@ public class MySQLClass2
                 conn = getConnection("farm");
                 ps = conn.prepareStatement("INSERT INTO cash (cash) VALUES (?)");
                 ps.setInt(1, cash);
+                ps.executeUpdate();
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void addTime(Long time){
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+
+            try{
+                conn = getConnection("farm");
+                ps = conn.prepareStatement("INSERT INTO time (time) VALUES (?)");
+                ps.setLong(1, time);
                 ps.executeUpdate();
             } finally {
                 try{
@@ -280,6 +344,59 @@ public class MySQLClass2
                         int cash = rs.getInt("cash");
 
                         list.add(cash);
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(rs != null){
+                        rs.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public List<Long> cacheTime(){
+        List<Long> list = new CopyOnWriteArrayList<>();
+
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+
+            try{
+                conn = getConnection("farm");
+                String query = "SELECT * FROM time";
+                ps = conn.prepareStatement(query);
+                rs = ps.executeQuery();
+
+                while (rs.next()){
+                    try{
+                        long time = rs.getLong("time");
+
+                        list.add(time);
                     } catch (Exception e){
                         e.printStackTrace();
                     }
