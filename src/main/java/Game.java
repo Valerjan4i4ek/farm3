@@ -13,6 +13,8 @@ public class Game
     private final List<Plant> plants;
 
     private int cash;
+    private long time;
+    private final List<Long> timeList;
     public MySQLCache cache;
 
     public static void main(String[] args) throws FileNotFoundException
@@ -35,11 +37,13 @@ public class Game
         this.scanner = new Scanner(System.in);
         cache = new MySQLCache(cash, fieldSize);
         this.cash = cache.getCash();
+        this.timeList = cache.getTime();
     }
 
     public void start() {
+
+
         while (true) {
-//            cash = cache.getCash();
             System.out.println(cache.getFields().values());
             System.out.println("YOUR CASH : " + cash);
             System.out.println("Enter cell for your plant (1-8)");
@@ -54,6 +58,8 @@ public class Game
                         cache.getFields().put(fieldNumber, field.updateField(plant));
                         cache.addPlant(fieldNumber, field);
                         cache.addCash(cash);
+                        time = System.currentTimeMillis() + plant.getTime();
+                        cache.addTime(time);
                     });
                 } else {
                     cash += field.getHarvestPrice();
@@ -63,6 +69,8 @@ public class Game
             });
         }
     }
+
+
 
     private Optional<Integer> validPlant(String userInput) {
         try{
