@@ -41,7 +41,7 @@ public class Game
     }
 
     public void start() {
-
+        restart();
 
         while (true) {
             System.out.println(cache.getFields().values());
@@ -69,8 +69,29 @@ public class Game
             });
         }
     }
+    
+    public void restart(){
+        for (int i = 0; i < cache.getFields().values().size(); i++) {
+            time(i);
+        }
+    }
 
+    public void time(int i){
+        if(checkTime() != null){
+            execute(() -> getHarvest(i), checkTime());
+        }
+    }
 
+    public Long checkTime(){
+        long l;
+        for (int i = 0; i < listTime.size(); i++) {
+            l = listTime.get(i) - System.currentTimeMillis();
+            if(l > 0){
+                return l;
+            }
+        }
+        return null;
+    }
 
     private Optional<Integer> validPlant(String userInput) {
         try{
