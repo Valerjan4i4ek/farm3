@@ -13,8 +13,6 @@ public class Game
     private final List<Plant> plants;
 
     private int cash;
-    private long time;
-    private final List<Long> timeList;
     public MySQLCache cache;
 
     public static void main(String[] args) throws FileNotFoundException
@@ -32,17 +30,13 @@ public class Game
     }
 
     public Game(List<Plant> plants, int cash, int fieldSize) {
-
+        this.cash = cash;
         this.plants = plants;
         this.scanner = new Scanner(System.in);
-        cache = new MySQLCache(cash, fieldSize);
-        this.cash = cache.getCash();
-        this.timeList = cache.getTime();
+        cache = new MySQLCache(fieldSize);
     }
 
     public void start() {
-        restart();
-
         while (true) {
             System.out.println(cache.getFields().values());
             System.out.println("YOUR CASH : " + cash);
@@ -57,9 +51,6 @@ public class Game
                         cash -= plant.getSeedPrice();
                         cache.getFields().put(fieldNumber, field.updateField(plant));
                         cache.addPlant(fieldNumber, field);
-                        cache.addCash(cash);
-                        time = System.currentTimeMillis() + plant.getTime();
-                        cache.addTime(time);
                     });
                 } else {
                     cash += field.getHarvestPrice();
@@ -68,29 +59,6 @@ public class Game
                 }
             });
         }
-    }
-    
-    public void restart(){
-        for (int i = 0; i < cache.getFields().values().size(); i++) {
-            time(i);
-        }
-    }
-
-    public void time(int i){
-        if(checkTime() != null){
-            execute(() -> getHarvest(i), checkTime());
-        }
-    }
-
-    public Long checkTime(){
-        long l;
-        for (int i = 0; i < listTime.size(); i++) {
-            l = listTime.get(i) - System.currentTimeMillis();
-            if(l > 0){
-                return l;
-            }
-        }
-        return null;
     }
 
     private Optional<Integer> validPlant(String userInput) {
@@ -120,10 +88,9 @@ public class Game
         return Optional.empty();
     }
 
-    public void getHarvest(int fieldNumber) {
+    public void  getHarvest(int fieldNumber) {
         cache.getFields().put(fieldNumber, cache.getFields().get(fieldNumber).updateField());
         cache.addPlant(fieldNumber, cache.getFields().get(fieldNumber));
-
         System.out.println(cache.getFields().values());
     }
 
