@@ -127,11 +127,11 @@ public class MySQLClass2
         try{
             Connection conn = null;
             Statement st = null;
-
             try{
                 conn = getConnection("farm");
                 st = conn.createStatement();
-                st.executeUpdate("CREATE TABLE IF NOT EXISTS farm.time (time BIGINT NOT NULL)");
+                st.executeUpdate("CREATE TABLE IF NOT EXISTS farm.time (fieldId INT NOT NULL, " +
+                        "time BIGINT NOT NULL)");
             }
             finally{
                 try{
@@ -233,15 +233,15 @@ public class MySQLClass2
         }
     }
 
-    public void addTime(Long time){
+    public void addTime(Integer fieldID, Long time){
         try{
             Connection conn = null;
             PreparedStatement ps = null;
-
             try{
                 conn = getConnection("farm");
-                ps = conn.prepareStatement("INSERT INTO time (time) VALUES (?)");
-                ps.setLong(1, time);
+                ps = conn.prepareStatement("INSERT INTO time (fieldID, time) VALUES (?, ?)");
+                ps.setInt(1, fieldID);
+                ps.setLong(2, time);
                 ps.executeUpdate();
             } finally {
                 try{
@@ -378,8 +378,8 @@ public class MySQLClass2
         return list;
     }
 
-    public List<Long> cacheTime(){
-        List<Long> list = new CopyOnWriteArrayList<>();
+    public Map<Integer, Long> cacheTime(){
+        Map<Integer, Long> map = new ConcurrentHashMap<>();
 
         try{
             Connection conn = null;
@@ -394,9 +394,10 @@ public class MySQLClass2
 
                 while (rs.next()){
                     try{
+                        int fieldId = rs.getInt("fieldId");
                         long time = rs.getLong("time");
 
-                        list.add(time);
+                        map.put(fieldId, time);
                     } catch (Exception e){
                         e.printStackTrace();
                     }
@@ -428,6 +429,6 @@ public class MySQLClass2
             e.printStackTrace();
         }
 
-        return list;
+        return map;
     }
 }
