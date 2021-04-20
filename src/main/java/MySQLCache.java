@@ -8,13 +8,13 @@ public class MySQLCache
     private Map<Integer, Field> cache;
     MySQLClass2 sql;
     List<Integer> listCash;
-    List<Long> listTime;
+    Map<Integer, Long> mapTime;
 
     public MySQLCache(int cash, int fieldSize){
         this.cache = new ConcurrentHashMap<>();
         sql = new MySQLClass2();
         this.listCash = new CopyOnWriteArrayList<>();
-        this.listTime = new CopyOnWriteArrayList<>();
+        this.mapTime = new ConcurrentHashMap<>();
         init(fieldSize);
         initCash(cash);
         initTime();
@@ -32,18 +32,17 @@ public class MySQLCache
         sql.addCash(cash);
     }
 
-    public void addTime(Long time){
-        listTime.add(time);
-        sql.addTime(time);
+    public void addTime(Integer fieldId, Long time){
+        mapTime.put(fieldId, time);
+        sql.addTime(fieldId, time);
     }
 
     public void initTime(){
         try{
-            List<Long> list = sql.cacheTime();
-            if(list != null && !list.isEmpty()){
-                for(long l : list){
-                    listTime.add(l);
-                }
+            Map<Integer, Long> map = sql.cacheTime();
+            for(int id : mapTime.keySet()){
+                long time = map.get(id);
+                mapTime.put(id, time);
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -97,7 +96,7 @@ public class MySQLCache
     }
 
 
-    public List<Long> getTime() {
-        return listTime;
+    public Map<Integer, Long> getTime() {
+        return mapTime;
     }
 }
