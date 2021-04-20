@@ -64,6 +64,7 @@ public class Game
                     cash += field.getHarvestPrice();
                     cache.getFields().put(fieldNumber, field.updateField());
                     cache.addPlant(fieldNumber, field);
+                    cache.addCash(cash);
                 }
             });
         }
@@ -71,7 +72,7 @@ public class Game
 
     public void restart(){
         for(Map.Entry<Integer, Long> entry : mapTime.entrySet()){
-            if(entry.getKey() != null && entry.getValue() != null){
+            if(entry.getValue() != null){
                 execute(() -> getHarvest(entry.getKey()), entry.getValue());
             }
         }
