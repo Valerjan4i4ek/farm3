@@ -11,8 +11,11 @@ public class Game
     private final Scanner scanner;
 
     private final List<Plant> plants;
+    private final Map<Integer, Long> mapTime;
 
     private int cash;
+    private long time;
+
     public MySQLCache cache;
 
     public static void main(String[] args) throws FileNotFoundException
@@ -30,13 +33,15 @@ public class Game
     }
 
     public Game(List<Plant> plants, int cash, int fieldSize) {
-        this.cash = cash;
         this.plants = plants;
         this.scanner = new Scanner(System.in);
-        cache = new MySQLCache(fieldSize);
+        cache = new MySQLCache(cash, fieldSize);
+        this.cash = cache.getCash();
+        this.mapTime = cache.getTime();
     }
 
     public void start() {
+        restart();
         while (true) {
             System.out.println(cache.getFields().values());
             System.out.println("YOUR CASH : " + cash);
@@ -51,6 +56,9 @@ public class Game
                         cash -= plant.getSeedPrice();
                         cache.getFields().put(fieldNumber, field.updateField(plant));
                         cache.addPlant(fieldNumber, field);
+                        cache.addCash(cash);
+                        time = System.currentTimeMillis() + plant.getTime()*1000;
+                        cache.addTime(fieldNumber, time);
                     });
                 } else {
                     cash += field.getHarvestPrice();
@@ -58,6 +66,14 @@ public class Game
                     cache.addPlant(fieldNumber, field);
                 }
             });
+        }
+    }
+
+    public void restart(){
+        for(Map.Entry<Integer, Long> entry : mapTime.entrySet()){
+            if(entry.getKey() != null && entry.getValue() != null){
+                execute(() -> getHarvest(entry.getKey()), entry.getValue());
+            }
         }
     }
 
@@ -88,9 +104,10 @@ public class Game
         return Optional.empty();
     }
 
-    public void  getHarvest(int fieldNumber) {
+    public void getHarvest(int fieldNumber) {
         cache.getFields().put(fieldNumber, cache.getFields().get(fieldNumber).updateField());
         cache.addPlant(fieldNumber, cache.getFields().get(fieldNumber));
+
         System.out.println(cache.getFields().values());
     }
 
