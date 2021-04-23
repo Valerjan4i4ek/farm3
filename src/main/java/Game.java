@@ -72,8 +72,13 @@ public class Game
 
     public void restart(){
         for(Map.Entry<Integer, Long> entry : mapTime.entrySet()){
-            if(entry.getValue() != null && entry.getValue() - System.currentTimeMillis() > 0){
-                execute(() -> getHarvest(entry.getKey()), entry.getValue() - System.currentTimeMillis());
+            if(entry.getValue() != null){
+                if(entry.getValue() - System.currentTimeMillis() > 0){
+                    execute(() -> getHarvest(entry.getKey()), (entry.getValue() - System.currentTimeMillis())/1000);
+                }
+                else {
+                    execute(() -> getHarvest(entry.getKey()), 0);
+                }
             }
         }
     }
