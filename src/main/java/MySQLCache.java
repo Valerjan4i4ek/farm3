@@ -39,10 +39,12 @@ public class MySQLCache
 
     public void initTime(){
         try{
-            Map<Integer, Long> map = sql.cacheTime();
-            for(int id : mapTime.keySet()){
-                long time = map.get(id);
-                mapTime.put(id, time);
+            Map<Integer, Long> tmp = sql.cacheTime();
+            if(tmp != null && !tmp.isEmpty()){
+                for (int id : tmp.keySet()){
+                    long time = tmp.get(id);
+                    mapTime.put(id, time);
+                }
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -52,7 +54,6 @@ public class MySQLCache
     public void initCash(int cash){
         try{
             listCash.add(cash);
-
             List<Integer> list = sql.cacheCash();
             if(list != null && !list.isEmpty()){
                 for(int i : list){
@@ -69,7 +70,6 @@ public class MySQLCache
             for (int i = 0; i < fieldSize; i++)
             {
                 cache.put(i, new Field());
-
             }
             Map<Integer, Field> tmp = sql.cache();
 
