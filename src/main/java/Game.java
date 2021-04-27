@@ -65,6 +65,7 @@ public class Game
                     cache.getFields().put(fieldNumber, field.updateField());
                     cache.addPlant(fieldNumber, field);
                     cache.addCash(cash);
+                    cache.deleteTime(fieldNumber);
                 }
             });
         }
@@ -72,11 +73,12 @@ public class Game
 
     public void restart(){
         for(Map.Entry<Integer, Long> entry : mapTime.entrySet()){
-            if(entry.getValue() != null){
+            if(entry.getKey() != null && entry.getValue() != null){
                 if(entry.getValue() - System.currentTimeMillis() > 0){
-                    execute(() -> getHarvest(entry.getKey()), (entry.getValue() - System.currentTimeMillis())/1000);
+                    execute(() -> getHarvest(entry.getKey()),
+                            (entry.getValue() - System.currentTimeMillis())/1000);
                 }
-                else {
+                else{
                     execute(() -> getHarvest(entry.getKey()), 0);
                 }
             }
