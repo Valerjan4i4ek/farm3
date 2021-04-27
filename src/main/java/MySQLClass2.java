@@ -127,6 +127,7 @@ public class MySQLClass2
         try{
             Connection conn = null;
             Statement st = null;
+
             try{
                 conn = getConnection("farm");
                 st = conn.createStatement();
@@ -237,11 +238,43 @@ public class MySQLClass2
         try{
             Connection conn = null;
             PreparedStatement ps = null;
+
             try{
                 conn = getConnection("farm");
                 ps = conn.prepareStatement("INSERT INTO time (fieldID, time) VALUES (?, ?)");
                 ps.setInt(1, fieldID);
                 ps.setLong(2, time);
+                ps.executeUpdate();
+            } finally {
+                try{
+                    if(conn != null){
+                        conn.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+                try{
+                    if(ps != null){
+                        ps.close();
+                    }
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteTime(int fieldId){
+        try{
+            Connection conn = null;
+            PreparedStatement ps = null;
+
+            try{
+                conn = getConnection("farm");
+                ps = conn.prepareStatement("DELETE FROM time WHERE fieldId = ?");
+                ps.setInt(1, fieldId);
                 ps.executeUpdate();
             } finally {
                 try{
