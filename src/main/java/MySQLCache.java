@@ -99,4 +99,9 @@ public class MySQLCache
     public Map<Integer, Long> getTime() {
         return mapTime;
     }
+
+    public void deleteTime(int i){
+        sql.deleteTime(i);
+//        mapTime.remove(i);
+    }
 }
