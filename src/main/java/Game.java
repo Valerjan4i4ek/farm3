@@ -79,7 +79,7 @@ public class Game
                             (entry.getValue() - System.currentTimeMillis())/1000);
                 }
                 else{
-                    execute(() -> getHarvest(entry.getKey()), 0);
+                    execute(() -> getHarvestRestart(entry.getKey()), 0);
                 }
             }
         }
@@ -114,6 +114,13 @@ public class Game
 
     public void getHarvest(int fieldNumber) {
         cache.getFields().put(fieldNumber, cache.getFields().get(fieldNumber).updateField());
+        cache.addPlant(fieldNumber, cache.getFields().get(fieldNumber));
+
+        System.out.println(cache.getFields().values());
+    }
+
+    public void getHarvestRestart(int fieldNumber) {
+        cache.getFields().put(fieldNumber, cache.getFields().get(fieldNumber).updateFieldRestart());
         cache.addPlant(fieldNumber, cache.getFields().get(fieldNumber));
 
         System.out.println(cache.getFields().values());
