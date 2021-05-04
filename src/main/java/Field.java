@@ -22,7 +22,14 @@ public class Field
     }
 
     public Field updateField() {
-        return updateField(sign== SIGN.EMPTY ? null : plant);
+        return updateField(sign == SIGN.EMPTY ? null : plant);
+    }
+
+    public Field updateFieldRestart(){
+        if(sign == SIGN.HARVEST){
+            return this;
+        }
+        return updateField(sign == SIGN.EMPTY ? null : plant);
     }
 
     public int getHarvestPrice() {
